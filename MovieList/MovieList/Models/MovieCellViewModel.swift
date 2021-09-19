@@ -13,6 +13,7 @@ struct MovieCellViewModel {
     let id: Int
     let title: String
     let releaseDate: String?
+    let overview: String?
     let rating: String?
     let poster: URL?
     
@@ -30,6 +31,7 @@ struct MovieCellViewModel {
         } else {
             self.rating = nil
         }
+        self.overview = movie.overview
         self.poster = ApiConstant.smallImageUrl.appendingPathComponent(movie.poster ?? "")
     }
 }

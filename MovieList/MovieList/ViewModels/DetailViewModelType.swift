@@ -11,12 +11,13 @@ import Combine
 struct DetailViewModelInput {
     
     let appear: AnyPublisher<Void, Never>
-    let favourite: AnyPublisher<Bool, Never>
+    let favourite: AnyPublisher<MovieDetailModel, Never>
 }
 
 enum DetailViewState {
     case loading
     case success(MovieDetailModel)
+    case favourite(Bool)
     case empty
     case error(Error)
 }

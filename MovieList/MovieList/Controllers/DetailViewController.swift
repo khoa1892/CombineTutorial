@@ -15,12 +15,14 @@ class DetailViewController: UIViewController {
     @IBOutlet weak private var titleLbl: UILabel!
     @IBOutlet weak private var ratingLbl: UILabel!
     @IBOutlet weak private var overviewLbl: UITextView!
-    @IBOutlet private weak var loadingView: UIActivityIndicatorView!
+    @IBOutlet weak private var loadingView: UIActivityIndicatorView!
+    @IBOutlet weak private var addBtn: UIBarButtonItem!
     
     let appear = PassthroughSubject<Void, Never>()
-    let favourite = PassthroughSubject<Bool, Never>()
+    let favourite = PassthroughSubject<MovieDetailModel, Never>()
     
     var viewModel: DetailViewModel!
+    private var movieDetail: MovieDetailModel?
     
     private var cancellables = Set<AnyCancellable>()
 
@@ -37,6 +39,13 @@ class DetailViewController: UIViewController {
     private func configureBinding() {
         
         let output = viewModel.initInput(input: DetailViewModelInput.init(appear: appear.eraseToAnyPublisher(), favourite: favourite.eraseToAnyPublisher()))
+        
+        viewModel.$isFav.sink { isFav in
+            
+            DispatchQueue.main.async {
+                self.addBtn.title = isFav ? "Added" : "Add"
+            }
+        }.store(in: &cancellables)
         
         output.sink { [weak self] state in
             self?.loadState(state)
@@ -60,6 +69,8 @@ class DetailViewController: UIViewController {
             break
         case .success(let movieDetail):
             DispatchQueue.main.async {
+                self.movieDetail = movieDetail
+                
                 self.loadingView.isHidden = true
                 self.loadingView.stopAnimating()
                 self.updateView(movieDetail)
@@ -70,6 +81,13 @@ class DetailViewController: UIViewController {
                 self.loadingView.isHidden = true
                 self.loadingView.stopAnimating()
                 self.titleLbl.text = nil
+            }
+            break
+        case .favourite(let isFav):
+            DispatchQueue.main.async {
+                self.addBtn.title = isFav ? "Added" : "Add"
+                self.loadingView.isHidden = true
+                self.loadingView.stopAnimating()
             }
             break
         }
@@ -89,6 +107,13 @@ class DetailViewController: UIViewController {
         let alertAction = UIAlertAction.init(title: "Ok", style: .cancel, handler: nil)
         alertController.addAction(alertAction)
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    @IBAction func addBtnTapped(_ sender: Any) {
+        guard let movieDetail = self.movieDetail else {
+            return
+        }
+        favourite.send(movieDetail)
     }
     
     deinit {

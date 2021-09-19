@@ -13,6 +13,8 @@ class DetailViewModel: DetailViewModelType {
     private let useCase: MoviesUseCaseType
     private let id: Int
     
+    @Published var isFav: Bool = false
+    private var movieDetail: MovieDetailModel?
     private var cancellabels = Set<AnyCancellable>()
     
     init(_ useCase: MoviesUseCaseType, id: Int) {
@@ -22,8 +24,20 @@ class DetailViewModel: DetailViewModelType {
     
     func initInput(input: DetailViewModelInput) -> DetailViewModelOutput {
         
-        input.favourite.sink { isFav in
+        input.favourite.sink { item in
             
+            let isFav = CoreDataHelper.checkMovieInfoExistInFavourites(item.id)
+            if isFav {
+                
+                CoreDataHelper.removeMovieInfoObjectFromFavourites(item.id) {
+                    self.isFav = false
+                }
+            } else {
+                
+                CoreDataHelper.addMovieInfoObjectToSavedItems(item) {
+                    self.isFav = true
+                }
+            }
         }.store(in: &cancellabels)
         
         let movieDetail = input.appear
@@ -39,7 +53,18 @@ class DetailViewModel: DetailViewModelType {
                 }
             }.eraseToAnyPublisher()
         
+        let favourite = CoreDataHelper.checkItemExist(self.id).map { result -> DetailViewState in
+            switch result {
+            case .success(let isFav):
+                return .favourite(isFav)
+            case .failure(_):
+                return .favourite(false)
+            }
+        }.eraseToAnyPublisher()
+        
+        let refresh = Publishers.Merge(movieDetail, favourite).eraseToAnyPublisher()
+        
         let loading: DetailViewModelOutput = input.appear.map({_ in .loading }).eraseToAnyPublisher()
-        return Publishers.Merge(loading, movieDetail).eraseToAnyPublisher()
+        return Publishers.Merge(loading, refresh).eraseToAnyPublisher()
     }
 }
