@@ -34,5 +34,5 @@ extension FavouriteViewState: Equatable {
 typealias FavouriteViewModelOutput = AnyPublisher<FavouriteViewState, Never>
 
 protocol FavouriteViewModelType {
-    func initInput(input: FavouriteViewModelInput) -> FavouriteViewModelOutput
+    func transform(input: FavouriteViewModelInput) -> FavouriteViewModelOutput
 }

@@ -43,7 +43,7 @@ class MovieUseCaseTest: XCTestCase {
         networkService.responses["/3/search/movie"] = movies
         
         // When
-        useCase.loadMovies("abc").sink { value in
+        useCase.searchMovies("abc", 1).sink { value in
             result = value
             expectation.fulfill()
         }.store(in: &cancellables)
@@ -64,7 +64,7 @@ class MovieUseCaseTest: XCTestCase {
         networkService.responses["/3/search/movie"] = NetworkError.invalidResponse
         
         // When
-        useCase.loadMovies("abc").sink { value in
+        useCase.searchMovies("abc", 1).sink { value in
             result = value
             expectation.fulfill()
         }.store(in: &cancellables)

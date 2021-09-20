@@ -10,40 +10,34 @@ import Combine
 
 class DetailViewModel: DetailViewModelType {
     
-    private let useCase: MoviesUseCaseType
+    private let useCase: MovieDetailUseCaseType
     private let id: Int
     
-    @Published var isFav: Bool = false
     private var movieDetail: MovieDetailModel?
-    private var cancellabels = Set<AnyCancellable>()
     
-    init(_ useCase: MoviesUseCaseType, id: Int) {
+    init(_ useCase: MovieDetailUseCaseType, id: Int) {
         self.useCase = useCase
         self.id = id
     }
     
-    func initInput(input: DetailViewModelInput) -> DetailViewModelOutput {
+    func transform(input: DetailViewModelInput) -> DetailViewModelOutput {
         
-        input.favourite.sink { item in
-            
+        let favouriteClick = input.favourite.flatMap { item -> AnyPublisher<Result<Bool, Error>, Never> in
             let isFav = CoreDataHelper.checkMovieInfoExistInFavourites(item.id)
             if isFav {
-                
-                CoreDataHelper.removeMovieInfoObjectFromFavourites(item.id) {
-                    self.isFav = false
-                }
+                return CoreDataHelper.removeFavItem(item.id)
             } else {
-                
-                CoreDataHelper.addMovieInfoObjectToSavedItems(item) {
-                    self.isFav = true
-                }
+                return CoreDataHelper.addMovieItem(item)
             }
-        }.store(in: &cancellabels)
+        }.map { [weak self] result -> DetailViewState in
+            
+            return self?.updateIsFav(result) ?? .empty
+        }.eraseToAnyPublisher()
         
         let movieDetail = input.appear
             .flatMap({ [unowned self] _ in self.useCase.loadMovieDetail(self.id) })
             .map { result -> DetailViewState in
-            
+                
                 switch result {
                 case .success(let movie):
                     let movieDetail = MovieDetailModel.init(movie: movie)
@@ -53,18 +47,25 @@ class DetailViewModel: DetailViewModelType {
                 }
             }.eraseToAnyPublisher()
         
-        let favourite = CoreDataHelper.checkItemExist(self.id).map { result -> DetailViewState in
-            switch result {
-            case .success(let isFav):
-                return .favourite(isFav)
-            case .failure(_):
-                return .favourite(false)
-            }
-        }.eraseToAnyPublisher()
+        let favourite = CoreDataHelper.checkItemExist(self.id)
+            .map { [weak self] result -> DetailViewState in
+                return self?.updateIsFav(result) ?? .empty
+            }.eraseToAnyPublisher()
         
         let refresh = Publishers.Merge(movieDetail, favourite).eraseToAnyPublisher()
+        let reloadFav = Publishers.Merge(refresh, favouriteClick).eraseToAnyPublisher()
         
         let loading: DetailViewModelOutput = input.appear.map({_ in .loading }).eraseToAnyPublisher()
-        return Publishers.Merge(loading, refresh).eraseToAnyPublisher()
+        return Publishers.Merge(loading, reloadFav).eraseToAnyPublisher()
+    }
+    
+    private func updateIsFav(_ result: Result<Bool, Error>) -> DetailViewState {
+        
+        switch result {
+        case .success(let isFav):
+            return .favourite(isFav)
+        case .failure(let error):
+            return .error(error)
+        }
     }
 }

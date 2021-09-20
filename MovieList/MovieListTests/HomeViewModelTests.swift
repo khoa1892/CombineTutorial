@@ -24,7 +24,7 @@ class HomeViewModelTests: XCTestCase {
     func test_loadData_searchBar() {
         
         let search = PassthroughSubject<String, Never>()
-        let input = HomeViewModelInput.init(appear: .just(()), editting: .just(""), search: search.eraseToAnyPublisher(), selection: .just(0))
+        let input = HomeViewModelInput.init(appear: .just(()), search: search.eraseToAnyPublisher(), loadMore: .just(""), selection: .just(0))
         var state:HomeViewState?
         
         let expection = self.expectation(description: "movies")
@@ -48,8 +48,8 @@ class HomeViewModelTests: XCTestCase {
             MovieCellViewModel.init(movie: movie)
         }
         
-        useCaseMock.stubbedLoadMoviesResult = .just(.success(movies))
-        viewModel.initInput(input: input).sink { value in
+        useCaseMock.stubbedSearchMoviesResult = .just(.success(movies))
+        viewModel.transform(input: input).sink { value in
             guard case HomeViewState.success = value else { return }
             state = value
             expection.fulfill()
@@ -61,15 +61,16 @@ class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(state!, .success(expectionCellViewModels))
     }
     
-    func test_loadData_IsFailed() {
+    func test_searchKeyword_IsFailed() {
         
         let search = PassthroughSubject<String, Never>()
-        let input = HomeViewModelInput.init(appear: .just(()), editting: .just(""), search: search.eraseToAnyPublisher(), selection: .just(0))
+        let input = HomeViewModelInput.init(appear: .just(()), search: search.eraseToAnyPublisher(), loadMore: .just(""), selection: .just(0))
         var state:HomeViewState?
         
         let expection = self.expectation(description: "movies")
-        useCaseMock.stubbedLoadMoviesResult = .just(.failure(NetworkError.invalidResponse))
-        viewModel.initInput(input: input).sink { value in
+        
+        useCaseMock.stubbedSearchMoviesResult = .just(.failure(NetworkError.invalidResponse))
+        viewModel.transform(input: input).sink { value in
             guard case HomeViewState.error = value else { return }
             state = value
             expection.fulfill()

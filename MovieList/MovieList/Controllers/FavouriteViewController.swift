@@ -33,10 +33,10 @@ class FavouriteViewController: UIViewController {
     
     private func configureBindings() {
         
-        viewModel = FavouriteViewModel.init(useCase: FavouriteUseCase.init(), routing: self)
+        viewModel = FavouriteViewModel.init(useCase: FavouriteUseCase.init(LocalService.init(CoreDataStack.shared.persistentContainer.viewContext)), routing: self)
         
         let input = FavouriteViewModelInput.init(selection: selection.eraseToAnyPublisher(), appear: appear.eraseToAnyPublisher())
-        let output = viewModel.initInput(input: input)
+        let output = viewModel.transform(input: input)
         
         output.sink { [weak self] state in
             self?.updateState(state)
@@ -67,8 +67,8 @@ class FavouriteViewController: UIViewController {
         case .success(let items):
             self.items = items
             DispatchQueue.main.async {
-                self.loadingView.isHidden = true
                 self.loadingView.stopAnimating()
+                self.loadingView.isHidden = true
                 self.tableView.reloadData()
             }
             break
@@ -89,7 +89,7 @@ extension FavouriteViewController: FavouriteRouting {
     func movieDetail(_ movieId: Int) {
         
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as! DetailViewController
-        vc.viewModel = DetailViewModel.init(MoviesUseCase.init(networkService: ServiceProvider.defaultProvider().network), id: movieId)
+        vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }

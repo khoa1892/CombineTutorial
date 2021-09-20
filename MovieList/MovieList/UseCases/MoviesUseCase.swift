@@ -10,8 +10,7 @@ import Combine
 
 protocol MoviesUseCaseType: AnyObject {
     
-    func loadMovies(_ keyword: String) -> AnyPublisher<Result<Movies, Error>, Never>
-    func loadMovieDetail(_ movieId: Int) -> AnyPublisher<Result<Movie, Error>, Never>
+    func searchMovies(_ keyword: String?, _ page: Int) -> AnyPublisher<Result<Movies, Error>, Never>
 }
 
 final class MoviesUseCase: MoviesUseCaseType {
@@ -22,18 +21,11 @@ final class MoviesUseCase: MoviesUseCaseType {
         self.networkService = networkService
     }
     
-    func loadMovies(_ keyword: String) -> AnyPublisher<Result<Movies, Error>, Never> {
+    func searchMovies(_ keyword: String?, _ page: Int) -> AnyPublisher<Result<Movies, Error>, Never> {
         return networkService
-            .load(Requestable<Movies>.movies(keyword))
+            .load(Requestable<Movies>.search(keyword, page))
             .map { .success($0) }
             .catch { error -> AnyPublisher<Result<Movies, Error>, Never> in .just(.failure(error)) }
-            .eraseToAnyPublisher()
-    }
-    
-    func loadMovieDetail(_ movieId: Int) -> AnyPublisher<Result<Movie, Error>, Never> {
-        return networkService.load(Requestable<Movie>.movieDetail(movieId))
-            .map { .success($0) }
-            .catch { error -> AnyPublisher<Result<Movie, Error>, Never> in .just(.failure(error)) }
             .eraseToAnyPublisher()
     }
 }

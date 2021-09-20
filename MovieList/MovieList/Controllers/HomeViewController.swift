@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class HomeViewController: UIViewController {
+class HomeViewController: UIViewController, Routing {
     
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var searchBar: UISearchBar!
@@ -18,17 +18,23 @@ class HomeViewController: UIViewController {
     
     private let appear = PassthroughSubject<Void, Never>()
     private let search = PassthroughSubject<String, Never>()
-    private let editting = PassthroughSubject<String, Never>()
     private let selection = PassthroughSubject<Int, Never>()
+    private let loadMore = PassthroughSubject<String, Never>()
     private let favourite = PassthroughSubject<Bool, Never>()
     
     private var cancellables = Set<AnyCancellable>()
     private var items = [MovieCellViewModel]()
+    private var limit: Int = 10
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureViewModel()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        appear.send(())
     }
     
     private func configureUI() {
@@ -41,11 +47,11 @@ class HomeViewController: UIViewController {
         viewModel = HomeViewModel.init(useCase: MoviesUseCase.init(networkService: ServiceProvider.defaultProvider().network), routing: self)
         
         let input = HomeViewModelInput.init(appear: appear.eraseToAnyPublisher(),
-                                            editting: editting.eraseToAnyPublisher(),
                                             search: search.eraseToAnyPublisher(),
+                                            loadMore: loadMore.eraseToAnyPublisher(),
                                             selection: selection.eraseToAnyPublisher())
         
-        let output = viewModel.initInput(input: input)
+        let output = viewModel.transform(input: input)
         
         output.sink { [weak self] state in
             
@@ -88,7 +94,7 @@ class HomeViewController: UIViewController {
             }
             break
         case .success(let items):
-            self.items = items
+            self.items += items
             DispatchQueue.main.async {
                 self.loadingView.stopAnimating()
                 self.loadingView.isHidden = true
@@ -104,14 +110,11 @@ class HomeViewController: UIViewController {
         alertController.addAction(alertAction)
         self.present(alertController, animated: true, completion: nil)
     }
-}
-
-extension HomeViewController: Routing {
     
     func movieDetail(_ movieId: Int) {
         
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as! DetailViewController
-        vc.viewModel = DetailViewModel.init(MoviesUseCase.init(networkService: ServiceProvider.defaultProvider().network), id: movieId)
+        vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -119,9 +122,8 @@ extension HomeViewController: Routing {
 extension HomeViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
+        self.items.removeAll()
         search.send(searchText)
-        editting.send(searchText)
     }
 }
 
@@ -130,6 +132,12 @@ extension HomeViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let id = items[indexPath.row].id
         selection.send(id)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if viewModel.canLoardMore {
+            loadMore.send(searchBar.text ?? "\"\"")
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

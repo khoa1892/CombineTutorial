@@ -38,14 +38,7 @@ class DetailViewController: UIViewController {
     
     private func configureBinding() {
         
-        let output = viewModel.initInput(input: DetailViewModelInput.init(appear: appear.eraseToAnyPublisher(), favourite: favourite.eraseToAnyPublisher()))
-        
-        viewModel.$isFav.sink { isFav in
-            
-            DispatchQueue.main.async {
-                self.addBtn.title = isFav ? "Added" : "Add"
-            }
-        }.store(in: &cancellables)
+        let output = viewModel.transform(input: DetailViewModelInput.init(appear: appear.eraseToAnyPublisher(), favourite: favourite.eraseToAnyPublisher()))
         
         output.sink { [weak self] state in
             self?.loadState(state)

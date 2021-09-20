@@ -32,11 +32,12 @@ struct Requestable<T: Decodable> {
 
 extension Requestable {
     
-    static func movies(_ keyword: String) -> Requestable<Movies> {
+    static func search(_ keyword: String?, _ page: Int) -> Requestable<Movies> {
         let url = ApiConstant.baseUrl.appendingPathComponent("/search/movie")
         let parameters: [String: CustomStringConvertible] = [
             "api_key": ApiConstant.apiKey,
-            "query": keyword
+            "query": keyword ?? "\"\"",
+            "page": page
         ]
         return Requestable<Movies>.init(url: url, parameters: parameters)
     }

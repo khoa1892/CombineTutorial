@@ -9,12 +9,6 @@ import Foundation
 import CoreData
 import Combine
 
-enum LocalError: Error {
-    case itemExist
-    case entityNotFound
-    case unknown
-}
-
 class CoreDataHelper {
     
     static func clearSavedFavourites(_ completionHandler: (()->Void)?) {
@@ -44,21 +38,17 @@ class CoreDataHelper {
         }
     }
     
-    static func removeFavItem(_ movieId: Int) -> AnyPublisher<Bool, Error> {
-        return Future.init { promise in
-            
-            let context = CoreDataStack.shared.persistentContainer.viewContext
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Favourite1")
-            fetchRequest.predicate = NSPredicate(format: "id == \(movieId)")
-            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            do {
-                try context.execute(batchDeleteRequest)
-                promise(.success(false))
-            } catch {
-                promise(.failure(error))
-            }
-            
-        }.eraseToAnyPublisher()
+    static func removeFavItem(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never> {
+        let context = CoreDataStack.shared.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Favourite1")
+        fetchRequest.predicate = NSPredicate(format: "id == \(movieId)")
+        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        do {
+            try context.execute(batchDeleteRequest)
+            return .just(.success(false))
+        } catch {
+            return .just(.failure(error))
+        }
     }
     
     static func checkMovieInfoExistInFavourites(_ id: Int) -> Bool {

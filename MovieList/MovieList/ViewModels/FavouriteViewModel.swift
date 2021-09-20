@@ -24,25 +24,28 @@ class FavouriteViewModel: FavouriteViewModelType {
         self.routing = routing
     }
     
-    func initInput(input: FavouriteViewModelInput) -> FavouriteViewModelOutput {
+    func transform(input: FavouriteViewModelInput) -> FavouriteViewModelOutput {
         
         input.selection.sink { [weak self] id in
             self?.routing?.movieDetail(id)
         }.store(in: &cancellabels)
         
         let movies = input.appear
-            .flatMap({ [unowned self] _ in self.useCase.loadMovies() })
+            .flatMap({ [unowned self] _ in self.useCase.loadFavourites() })
             .map { result -> FavouriteViewState in
                 switch result {
                 case .success(let items):
-                    return .success(items)
+                    let movies = items.map { item -> MovieCellViewModel in
+                        
+                        let movie = Movie.init(id: Int(item.id), title: item.title ?? "", overview: item.overview ?? "", poster: item.poster, voteAverage: item.rating, releaseDate: item.releasedate)
+                        return MovieCellViewModel.init(movie: movie, managedObjectId: item.objectID)
+                    }
+                    return .success(movies)
                 case .failure(let error):
                     return .error(error)
                 }
             }.eraseToAnyPublisher()
         
-        let loading: FavouriteViewModelOutput = input.appear.map({_ in .loading }).eraseToAnyPublisher()
-        
-        return Publishers.Merge(movies, loading).eraseToAnyPublisher()
+        return movies
     }
 }

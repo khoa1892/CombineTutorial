@@ -11,8 +11,8 @@ import Combine
 struct HomeViewModelInput {
     
     let appear: AnyPublisher<Void, Never>
-    let editting: AnyPublisher<String, Never>
     let search: AnyPublisher<String, Never>
+    let loadMore: AnyPublisher<String, Never>
     let selection: AnyPublisher<Int, Never>
 }
 
@@ -40,5 +40,5 @@ extension HomeViewState: Equatable {
 typealias HomeViewModelOutput = AnyPublisher<HomeViewState, Never>
 
 protocol HomeViewModelType {
-    func initInput(input: HomeViewModelInput) -> HomeViewModelOutput
+    func transform(input: HomeViewModelInput) -> HomeViewModelOutput
 }

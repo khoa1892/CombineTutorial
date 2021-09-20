@@ -37,5 +37,5 @@ extension DetailViewState: Equatable {
 typealias DetailViewModelOutput = AnyPublisher<DetailViewState, Never>
 
 protocol DetailViewModelType {
-    func initInput(input: DetailViewModelInput) -> DetailViewModelOutput
+    func transform(input: DetailViewModelInput) -> DetailViewModelOutput
 }
