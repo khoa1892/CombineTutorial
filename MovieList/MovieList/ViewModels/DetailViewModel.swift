@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreData
 
 class DetailViewModel: DetailViewModelType {
     
@@ -22,12 +23,13 @@ class DetailViewModel: DetailViewModelType {
     
     func transform(input: DetailViewModelInput) -> DetailViewModelOutput {
         
-        let favouriteClick = input.favourite.flatMap { item -> AnyPublisher<Result<Bool, Error>, Never> in
-            let isFav = CoreDataHelper.checkMovieInfoExistInFavourites(item.id)
+        let favouriteClick = input.favourite.flatMap { [unowned self] result -> AnyPublisher<Result<NSManagedObject?, Error>, Never> in
+            let (item, isFav) = result
             if isFav {
-                return CoreDataHelper.removeFavItem(item.id)
+                return self.useCase.removeFav(self.id)
             } else {
-                return CoreDataHelper.addMovieItem(item)
+                let movie = item.movie
+                return self.useCase.addFav(movieId: movie.id, title: movie.title, releaseDate: movie.releaseDate ?? "", poster: movie.poster ?? "", rating: movie.voteAverage)
             }
         }.map { [weak self] result -> DetailViewState in
             
@@ -47,9 +49,14 @@ class DetailViewModel: DetailViewModelType {
                 }
             }.eraseToAnyPublisher()
         
-        let favourite = CoreDataHelper.checkItemExist(self.id)
-            .map { [weak self] result -> DetailViewState in
-                return self?.updateIsFav(result) ?? .empty
+        let favourite = self.useCase.checkItemExit(self.id)
+            .map { result -> DetailViewState in
+                switch result {
+                case .success(let isFav):
+                    return .favourite(isFav)
+                case .failure(_):
+                    return .favourite(false)
+                }
             }.eraseToAnyPublisher()
         
         let refresh = Publishers.Merge(movieDetail, favourite).eraseToAnyPublisher()
@@ -59,11 +66,11 @@ class DetailViewModel: DetailViewModelType {
         return Publishers.Merge(loading, reloadFav).eraseToAnyPublisher()
     }
     
-    private func updateIsFav(_ result: Result<Bool, Error>) -> DetailViewState {
+    private func updateIsFav(_ result: Result<NSManagedObject?, Error>) -> DetailViewState {
         
         switch result {
-        case .success(let isFav):
-            return .favourite(isFav)
+        case .success(let item):
+            return .favourite(item != nil)
         case .failure(let error):
             return .error(error)
         }

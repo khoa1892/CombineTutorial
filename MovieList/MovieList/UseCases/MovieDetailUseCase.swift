@@ -13,45 +13,57 @@ protocol MovieDetailUseCaseType: AnyObject {
     
     func loadMovieDetail(_ movieId: Int) -> AnyPublisher<Result<Movie, Error>, Never>
     func checkItemExist(_ objectID: NSManagedObjectID) -> AnyPublisher<Result<NSManagedObject, Error>, Never>
-    func addFav(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Result<NSManagedObject, Error>, Never>
-    func removeFav(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Result<NSManagedObject, Error>, Never>
+    func checkItemExit(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never>
+    func addFav(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Result<NSManagedObject?, Error>, Never>
+    func removeFav(_ movieId: Int) -> AnyPublisher<Result<NSManagedObject?, Error>, Never>
 }
 
-final class MovieDetailUseCase: MovieDetailUseCaseType {
+class MovieDetailUseCase: MovieDetailUseCaseType {
     
     let networkService: NetworkServiceType
-    let localService: LocalServiceType
+    let localService: LocalService<Favourite1>
     
-    init(networkService: NetworkServiceType, localService: LocalServiceType) {
+    init(networkService: NetworkServiceType, localService: LocalService<Favourite1>) {
         self.networkService = networkService
         self.localService = localService
     }
     
     func loadMovieDetail(_ movieId: Int) -> AnyPublisher<Result<Movie, Error>, Never> {
-        return networkService.load(Requestable<Movie>.movieDetail(movieId))
+        return networkService
+            .load(Requestable<Movie>.movieDetail(movieId))
             .map { .success($0) }
             .catch { error -> AnyPublisher<Result<Movie, Error>, Never> in .just(.failure(error)) }
             .eraseToAnyPublisher()
     }
     
     func checkItemExist(_ objectID: NSManagedObjectID) -> AnyPublisher<Result<NSManagedObject, Error>, Never> {
-        return localService.checkItemExist(objectID)
+        return localService
+            .checkItemExist(objectID)
             .map{ .success($0) }
             .catch { error -> AnyPublisher<Result<NSManagedObject, Error>, Never> in .just(.failure(error)) }
             .eraseToAnyPublisher()
     }
     
-    func addFav(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Result<NSManagedObject, Error>, Never> {
-        return localService.addMovie(movieId: movieId, title: title, releaseDate: releaseDate, poster: poster, rating: rating)
+    func checkItemExit(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never> {
+        return localService.checkItemExist(movieId)
             .map{ .success($0) }
-            .catch { error -> AnyPublisher<Result<NSManagedObject, Error>, Never> in .just(.failure(error)) }
+            .catch { error -> AnyPublisher<Result<Bool, Error>, Never> in .just(.failure(error)) }
             .eraseToAnyPublisher()
     }
     
-    func removeFav(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Result<NSManagedObject, Error>, Never> {
-        return localService.removeMovie(managedObjectId)
+    func addFav(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Result<NSManagedObject?, Error>, Never> {
+        return localService
+            .addMovie(movieId: movieId, title: title, releaseDate: releaseDate, poster: poster, rating: rating)
             .map{ .success($0) }
-            .catch { error -> AnyPublisher<Result<NSManagedObject, Error>, Never> in .just(.failure(error)) }
+            .catch { error -> AnyPublisher<Result<NSManagedObject?, Error>, Never> in .just(.failure(error)) }
+            .eraseToAnyPublisher()
+    }
+    
+    func removeFav(_ movieId: Int) -> AnyPublisher<Result<NSManagedObject?, Error>, Never> {
+        return localService
+            .removeMovie(movieId)
+            .map{ .success($0) }
+            .catch { error -> AnyPublisher<Result<NSManagedObject?, Error>, Never> in .just(.failure(error)) }
             .eraseToAnyPublisher()
     }
 }

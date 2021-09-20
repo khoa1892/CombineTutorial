@@ -21,6 +21,12 @@ class HomeViewModel: HomeViewModelType {
     private var currentPage: Int = 1
     private var totalPage: Int = 0
     
+    var items: [MovieCellViewModel] = [] {
+        didSet {
+            
+        }
+    }
+    
     var canLoardMore: Bool {
         return currentPage < totalPage
     }
@@ -76,14 +82,15 @@ class HomeViewModel: HomeViewModelType {
         let loadMore = input.loadMore.flatMap { [unowned self] keyword -> AnyPublisher<Result<Movies, Error>, Never> in
             
             return self.useCase.searchMovies(keyword, currentPage)
-        }.map({ result -> HomeViewState in
+        }.map({ [weak self] result -> HomeViewState in
             
             switch result {
             case .success(let response):
                 let cellViewModels = response.items.map { movie in
                     MovieCellViewModel.init(movie: movie)
                 }
-                return .success(cellViewModels)
+                self?.items += cellViewModels
+                return .success(self?.items ?? [])
             case .failure(let error):
                 return .error(error)
             }
@@ -106,9 +113,10 @@ class HomeViewModel: HomeViewModelType {
                 let cellViewModels = response.items.map { movie in
                     MovieCellViewModel.init(movie: movie)
                 }
+                items = cellViewModels
                 totalPage = response.totalPage
                 currentPage += 1
-                return .success(cellViewModels)
+                return .success(items)
             }
         case .failure(let error):
             return .error(error)

@@ -18,11 +18,12 @@ class DetailViewController: UIViewController {
     @IBOutlet weak private var loadingView: UIActivityIndicatorView!
     @IBOutlet weak private var addBtn: UIBarButtonItem!
     
-    let appear = PassthroughSubject<Void, Never>()
-    let favourite = PassthroughSubject<MovieDetailModel, Never>()
+    private let appear = PassthroughSubject<Void, Never>()
+    private let favourite = PassthroughSubject<(MovieDetailModel, Bool), Never>()
     
     var viewModel: DetailViewModel!
     private var movieDetail: MovieDetailModel?
+    private var isFav: Bool = false
     
     private var cancellables = Set<AnyCancellable>()
 
@@ -79,6 +80,7 @@ class DetailViewController: UIViewController {
         case .favourite(let isFav):
             DispatchQueue.main.async {
                 self.addBtn.title = isFav ? "Added" : "Add"
+                self.isFav = isFav
                 self.loadingView.isHidden = true
                 self.loadingView.stopAnimating()
             }
@@ -106,7 +108,7 @@ class DetailViewController: UIViewController {
         guard let movieDetail = self.movieDetail else {
             return
         }
-        favourite.send(movieDetail)
+        favourite.send((movieDetail, isFav))
     }
     
     deinit {

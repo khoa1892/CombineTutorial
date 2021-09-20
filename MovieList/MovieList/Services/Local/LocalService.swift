@@ -9,21 +9,42 @@ import Foundation
 import CoreData
 import Combine
 
-class LocalService: LocalServiceType {
+class LocalService<T: NSManagedObject>: LocalServiceType {
+    
+    typealias Entity = T
     
     let context: NSManagedObjectContext
     init(_ context: NSManagedObjectContext = CoreDataStack.shared.persistentContainer.viewContext) {
         self.context = context
     }
     
-    func checkItemExist<Entity: NSManagedObject>(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Entity, Error> {
+    func checkItemExist(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Entity, Error> {
         guard let object = try? context.existingObject(with: managedObjectId) as? Entity else {
             return .fail(error: LocalError.itemNotExist)
         }
         return .just(object)
     }
     
-    func addMovie<Entity: NSManagedObject>(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Entity, Error> {
+    func checkItemExist(_ movieId: Int) -> AnyPublisher<Bool, Error> {
+        var isExist:Bool = false
+        do {
+            if let favouriteItems = try context.fetch(Entity.fetchRequest()) as? [Entity] {
+                
+                for item in favouriteItems {
+                    let id = item.value(forKey: "id") as? Int64 ?? 0
+                    if movieId == id {
+                        isExist = true
+                        break
+                    }
+                }
+            }
+            return .just(isExist)
+        } catch {
+            return .fail(error: error)
+        }
+    }
+    
+    func addMovie(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Entity?, Error> {
         guard let entity = NSEntityDescription.entity(forEntityName: String(describing: Entity.self), in: context) else {
             return .fail(error: LocalError.entityNotFound)
         }
@@ -34,30 +55,35 @@ class LocalService: LocalServiceType {
         savedItem.setValue(movieId, forKey: "id")
         do {
             try context.save()
-            return .just(savedItem as! Entity)
+            return .just(savedItem as? Entity)
         } catch let error as NSError {
             return .fail(error: error)
         }
     }
     
-    func removeMovie<Entity: NSManagedObject>(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Entity, Error> {
-        guard let object = try? context.existingObject(with: managedObjectId) as? Entity else {
-            return .fail(error: LocalError.itemNotExist)
-        }
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: Entity.self))
-        fetchRequest.predicate = NSPredicate(format: "objectID == \(managedObjectId)")
-        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+    func removeMovie(_ movieId: Int) -> AnyPublisher<Entity?, Error> {
+        
         do {
-            try context.execute(batchDeleteRequest)
-            return .just(object)
-        } catch {
+            if let favouriteItems = try context.fetch(Entity.fetchRequest()) as? [Entity] {
+                
+                for item in favouriteItems {
+                    let id = item.value(forKey: "id") as? Int64 ?? 0
+                    if movieId == id {
+                        self.context.delete(context.object(with: item.objectID))
+                        break
+                    }
+                }
+            }
+            try self.context.save()
+            return .just(nil)
+        } catch let error {
             return .fail(error: error)
         }
     }
-    
-    func fetchMovies<Entity: NSManagedObject>() -> AnyPublisher<[Entity], Error> {
+
+    func fetchMovies() -> AnyPublisher<[Entity], Error> {
         do {
-            
+
             let favouriteItems = try context.fetch(Entity.fetchRequest()) as? [Entity]
             return .just(favouriteItems ?? [])
         } catch let error {

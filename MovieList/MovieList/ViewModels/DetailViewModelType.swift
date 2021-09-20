@@ -11,7 +11,7 @@ import Combine
 struct DetailViewModelInput {
     
     let appear: AnyPublisher<Void, Never>
-    let favourite: AnyPublisher<MovieDetailModel, Never>
+    let favourite: AnyPublisher<(MovieDetailModel, Bool), Never>
 }
 
 enum DetailViewState {

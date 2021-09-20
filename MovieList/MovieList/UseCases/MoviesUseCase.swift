@@ -13,7 +13,7 @@ protocol MoviesUseCaseType: AnyObject {
     func searchMovies(_ keyword: String?, _ page: Int) -> AnyPublisher<Result<Movies, Error>, Never>
 }
 
-final class MoviesUseCase: MoviesUseCaseType {
+class MoviesUseCase: MoviesUseCaseType {
     
     let networkService: NetworkServiceType
     

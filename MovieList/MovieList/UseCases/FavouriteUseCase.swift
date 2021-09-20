@@ -16,9 +16,9 @@ protocol FavouriteUseCaseType: AnyObject {
 
 class FavouriteUseCase: FavouriteUseCaseType {
     
-    let localService: LocalServiceType
+    let localService: LocalService<Favourite1>
     
-    init(_ localService: LocalServiceType) {
+    init(_ localService: LocalService<Favourite1>) {
         self.localService = localService
     }
     

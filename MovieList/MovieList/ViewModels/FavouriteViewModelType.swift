@@ -7,10 +7,11 @@
 
 import Foundation
 import Combine
+import CoreData
 
 struct FavouriteViewModelInput {
     
-    let selection: AnyPublisher<Int, Never>
+    let selection: AnyPublisher<MovieCellViewModel, Never>
     let appear: AnyPublisher<Void, Never>
 }
 

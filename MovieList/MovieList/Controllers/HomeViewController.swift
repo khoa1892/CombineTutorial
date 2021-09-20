@@ -30,10 +30,7 @@ class HomeViewController: UIViewController, Routing {
         super.viewDidLoad()
         configureUI()
         configureViewModel()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        loadingView.startAnimating()
         appear.send(())
     }
     
@@ -94,8 +91,8 @@ class HomeViewController: UIViewController, Routing {
             }
             break
         case .success(let items):
-            self.items += items
             DispatchQueue.main.async {
+                self.items = items
                 self.loadingView.stopAnimating()
                 self.loadingView.isHidden = true
                 self.tableView.reloadData()
@@ -114,7 +111,7 @@ class HomeViewController: UIViewController, Routing {
     func movieDetail(_ movieId: Int) {
         
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as! DetailViewController
-        vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
+        vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService<Favourite1>.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -122,7 +119,6 @@ class HomeViewController: UIViewController, Routing {
 extension HomeViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        self.items.removeAll()
         search.send(searchText)
     }
 }
@@ -135,7 +131,7 @@ extension HomeViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if viewModel.canLoardMore {
+        if viewModel.canLoardMore && indexPath.row >= items.count - 3 {
             loadMore.send(searchBar.text ?? "\"\"")
         }
     }

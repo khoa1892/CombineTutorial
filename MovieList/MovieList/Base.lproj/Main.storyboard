@@ -269,7 +269,7 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Detail" id="mSq-MJ-WJr">
-                        <barButtonItem key="rightBarButtonItem" id="JPn-g1-x9z">
+                        <barButtonItem key="rightBarButtonItem" title="Add" id="JPn-g1-x9z">
                             <connections>
                                 <action selector="addBtnTapped:" destination="xvp-m4-Yno" id="lhH-zl-tqr"/>
                             </connections>
@@ -328,7 +328,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="dOa-Yt-BJH"/>
+        <segue reference="HzD-0X-NCH"/>
     </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="labelColor">

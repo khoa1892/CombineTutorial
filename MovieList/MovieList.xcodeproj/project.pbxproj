@@ -41,7 +41,6 @@
 		10F5D07626F77AFD000DEDE2 /* MovieUseCaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D07526F77AFD000DEDE2 /* MovieUseCaseTest.swift */; };
 		10F5D07826F782BA000DEDE2 /* NetworkServiceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D07726F782BA000DEDE2 /* NetworkServiceTest.swift */; };
 		10F5D08426F78C5D000DEDE2 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D08326F78C5D000DEDE2 /* CoreDataStack.swift */; };
-		10F5D08626F78CDA000DEDE2 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D08526F78CDA000DEDE2 /* CoreDataHelper.swift */; };
 		10F5D0D426F79D12000DEDE2 /* FavouriteModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D0D226F79D12000DEDE2 /* FavouriteModel.xcdatamodeld */; };
 		10F5D0E626F7AA3E000DEDE2 /* FavouriteUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D0E526F7AA3E000DEDE2 /* FavouriteUseCase.swift */; };
 		10F5D0EC26F7AD0E000DEDE2 /* FavouriteViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F5D0EB26F7AD0E000DEDE2 /* FavouriteViewModelType.swift */; };
@@ -112,7 +111,6 @@
 		10F5D07526F77AFD000DEDE2 /* MovieUseCaseTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieUseCaseTest.swift; sourceTree = "<group>"; };
 		10F5D07726F782BA000DEDE2 /* NetworkServiceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkServiceTest.swift; sourceTree = "<group>"; };
 		10F5D08326F78C5D000DEDE2 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
-		10F5D08526F78CDA000DEDE2 /* CoreDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
 		10F5D0D326F79D12000DEDE2 /* FavouriteModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FavouriteModel.xcdatamodel; sourceTree = "<group>"; };
 		10F5D0E126F79E89000DEDE2 /* Favourite1+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Favourite1+CoreDataClass.swift"; sourceTree = "<group>"; };
 		10F5D0E226F79E89000DEDE2 /* Favourite1+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Favourite1+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -342,7 +340,6 @@
 		10F5D0F326F825C4000DEDE2 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
-				10F5D08526F78CDA000DEDE2 /* CoreDataHelper.swift */,
 				10F5D08326F78C5D000DEDE2 /* CoreDataStack.swift */,
 			);
 			path = Helper;
@@ -633,7 +630,6 @@
 				10B6275A26F43C0F00B44D06 /* AppDelegate.swift in Sources */,
 				10F5D03E26F5EA43000DEDE2 /* Publisher+Utils.swift in Sources */,
 				10B6275C26F43C0F00B44D06 /* SceneDelegate.swift in Sources */,
-				10F5D08626F78CDA000DEDE2 /* CoreDataHelper.swift in Sources */,
 				10B6279E26F470FE00B44D06 /* Movies.swift in Sources */,
 				10F5D0E626F7AA3E000DEDE2 /* FavouriteUseCase.swift in Sources */,
 				10F5D05B26F7097A000DEDE2 /* DetailViewModel.swift in Sources */,

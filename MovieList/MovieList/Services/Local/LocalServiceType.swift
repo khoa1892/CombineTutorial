@@ -11,10 +11,12 @@ import Combine
 
 protocol LocalServiceType {
     
-    func checkItemExist<Entity: NSManagedObject>(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Entity, Error>
-    func addMovie<Entity: NSManagedObject>(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Entity, Error>
-    func removeMovie<Entity: NSManagedObject>(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Entity, Error>
-    func fetchMovies<Entity: NSManagedObject>() -> AnyPublisher<[Entity], Error>
+    associatedtype Entity
+    
+    func checkItemExist(_ movieId: Int) -> AnyPublisher<Bool, Error>
+    func addMovie(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Entity?, Error>
+    func removeMovie(_ movieId: Int) -> AnyPublisher<Entity?, Error>
+    func fetchMovies() -> AnyPublisher<[Entity], Error>
 }
 
 enum LocalError: Error {

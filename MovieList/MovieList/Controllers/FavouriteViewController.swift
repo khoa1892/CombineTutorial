@@ -7,14 +7,15 @@
 
 import UIKit
 import Combine
+import CoreData
 
 class FavouriteViewController: UIViewController {
     
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet weak private var loadingView: UIActivityIndicatorView!
     
-    let appear = PassthroughSubject<Void, Never>()
-    let selection = PassthroughSubject<Int, Never>()
+    private let appear = PassthroughSubject<Void, Never>()
+    private let selection = PassthroughSubject<MovieCellViewModel, Never>()
     private var cancellabels = Set<AnyCancellable>()
     
     private var items = [MovieCellViewModel]()
@@ -39,6 +40,7 @@ class FavouriteViewController: UIViewController {
         let output = viewModel.transform(input: input)
         
         output.sink { [weak self] state in
+            
             self?.updateState(state)
         }.store(in: &cancellabels)
     }
@@ -87,9 +89,8 @@ class FavouriteViewController: UIViewController {
 extension FavouriteViewController: FavouriteRouting {
     
     func movieDetail(_ movieId: Int) {
-        
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as! DetailViewController
-        vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
+        vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService<Favourite1>.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -97,8 +98,8 @@ extension FavouriteViewController: FavouriteRouting {
 extension FavouriteViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let id = items[indexPath.row].id
-        selection.send(id)
+        let item = items[indexPath.row]
+        selection.send(item)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

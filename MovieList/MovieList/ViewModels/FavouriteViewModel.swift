@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreData
 
 protocol FavouriteRouting: AnyObject {
     func movieDetail(_ movieId: Int)
@@ -26,8 +27,8 @@ class FavouriteViewModel: FavouriteViewModelType {
     
     func transform(input: FavouriteViewModelInput) -> FavouriteViewModelOutput {
         
-        input.selection.sink { [weak self] id in
-            self?.routing?.movieDetail(id)
+        input.selection.sink { [weak self] item in
+            self?.routing?.movieDetail(item.id)
         }.store(in: &cancellabels)
         
         let movies = input.appear
@@ -38,7 +39,7 @@ class FavouriteViewModel: FavouriteViewModelType {
                     let movies = items.map { item -> MovieCellViewModel in
                         
                         let movie = Movie.init(id: Int(item.id), title: item.title ?? "", overview: item.overview ?? "", poster: item.poster, voteAverage: item.rating, releaseDate: item.releasedate)
-                        return MovieCellViewModel.init(movie: movie, managedObjectId: item.objectID)
+                        return MovieCellViewModel.init(movie: movie)
                     }
                     return .success(movies)
                 case .failure(let error):
