@@ -50,24 +50,8 @@ class HomeViewModel: HomeViewModelType {
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .removeDuplicates()
         
-        let initialState: HomeViewModelOutput = input.appear.flatMap { [unowned self] _ -> AnyPublisher<Result<Movies, Error>, Never> in
-            
-            self.currentPage = 1
-            return self.useCase.searchMovies(nil, self.currentPage)
-        }.map({ [weak self] result -> HomeViewState in
-            
-            return self?.refreshList(result) ?? .empty
-        }).eraseToAnyPublisher()
-        
-        let emptySearchString: HomeViewModelOutput = searchInput.filter({ $0.isEmpty })
-            .flatMap { [unowned self] _ -> AnyPublisher<Result<Movies, Error>, Never> in
-                
-                self.currentPage = 1
-                return self.useCase.searchMovies(nil, self.currentPage)
-            }.map({ [weak self] result -> HomeViewState in
-
-                return self?.refreshList(result) ?? .empty
-        }).eraseToAnyPublisher()
+        let initialState: HomeViewModelOutput = .just(.idle)
+        let emptySearchString: HomeViewModelOutput = searchInput.filter({ $0.isEmpty}).map({ _ in .empty }).eraseToAnyPublisher()
         
         let searchMovies = searchInput.filter({ !$0.isEmpty })
             .flatMap { [unowned self] keyword -> AnyPublisher<Result<Movies, Error>, Never> in
@@ -90,6 +74,7 @@ class HomeViewModel: HomeViewModelType {
                     MovieCellViewModel.init(movie: movie)
                 }
                 self?.items += cellViewModels
+                self?.currentPage += 1
                 return .success(self?.items ?? [])
             case .failure(let error):
                 return .error(error)

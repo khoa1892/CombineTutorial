@@ -43,9 +43,13 @@ class DetailViewModelTests: XCTestCase {
         let movie: Movie = try! JSONDecoder().decode(Movie.self, from: jsonData)
         let expectionCellViewModel = MovieDetailModel.init(movie: movie)
         
-        let input = DetailViewModelInput.init(appear: .just(()), favourite: .just(expectionCellViewModel))
+        let input = DetailViewModelInput.init(appear: .just(()), favourite: .just((expectionCellViewModel, false)))
         
         useCaseMock.stubbedLoadMovieDetailResult = .just(.success(movie))
+        useCaseMock.stubbedCheckItemExitResult = .just(.failure(LocalError.entityNotFound))
+        useCaseMock.stubbedAddFavResult = .just(.failure(LocalError.entityNotFound))
+        useCaseMock.stubbedRemoveFavResult = .just(.failure(LocalError.itemExist))
+        
         viewModel.transform(input: input).sink { value in
             guard case DetailViewState.success = value else { return }
             state = value

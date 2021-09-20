@@ -40,13 +40,27 @@ class MovieDetailUseCase: MovieDetailUseCaseType {
         return stubbedCheckItemExistResult
     }
 
+    var invokedCheckItemExit = false
+    var invokedCheckItemExitCount = 0
+    var invokedCheckItemExitParameters: (movieId: Int, Void)?
+    var invokedCheckItemExitParametersList = [(movieId: Int, Void)]()
+    var stubbedCheckItemExitResult: AnyPublisher<Result<Bool, Error>, Never>!
+
+    func checkItemExit(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never> {
+        invokedCheckItemExit = true
+        invokedCheckItemExitCount += 1
+        invokedCheckItemExitParameters = (movieId, ())
+        invokedCheckItemExitParametersList.append((movieId, ()))
+        return stubbedCheckItemExitResult
+    }
+
     var invokedAddFav = false
     var invokedAddFavCount = 0
     var invokedAddFavParameters: (movieId: Int, title: String, releaseDate: String, poster: String, rating: Float)?
     var invokedAddFavParametersList = [(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float)]()
-    var stubbedAddFavResult: AnyPublisher<Result<NSManagedObject, Error>, Never>!
+    var stubbedAddFavResult: AnyPublisher<Result<NSManagedObject?, Error>, Never>!
 
-    func addFav(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Result<NSManagedObject, Error>, Never> {
+    func addFav(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Result<NSManagedObject?, Error>, Never> {
         invokedAddFav = true
         invokedAddFavCount += 1
         invokedAddFavParameters = (movieId, title, releaseDate, poster, rating)
@@ -56,15 +70,15 @@ class MovieDetailUseCase: MovieDetailUseCaseType {
 
     var invokedRemoveFav = false
     var invokedRemoveFavCount = 0
-    var invokedRemoveFavParameters: (managedObjectId: NSManagedObjectID, Void)?
-    var invokedRemoveFavParametersList = [(managedObjectId: NSManagedObjectID, Void)]()
-    var stubbedRemoveFavResult: AnyPublisher<Result<NSManagedObject, Error>, Never>!
+    var invokedRemoveFavParameters: (movieId: Int, Void)?
+    var invokedRemoveFavParametersList = [(movieId: Int, Void)]()
+    var stubbedRemoveFavResult: AnyPublisher<Result<NSManagedObject?, Error>, Never>!
 
-    func removeFav(_ managedObjectId: NSManagedObjectID) -> AnyPublisher<Result<NSManagedObject, Error>, Never> {
+    func removeFav(_ movieId: Int) -> AnyPublisher<Result<NSManagedObject?, Error>, Never> {
         invokedRemoveFav = true
         invokedRemoveFavCount += 1
-        invokedRemoveFavParameters = (managedObjectId, ())
-        invokedRemoveFavParametersList.append((managedObjectId, ()))
+        invokedRemoveFavParameters = (movieId, ())
+        invokedRemoveFavParametersList.append((movieId, ()))
         return stubbedRemoveFavResult
     }
 }
