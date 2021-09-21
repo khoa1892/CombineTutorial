@@ -24,7 +24,7 @@ class HomeViewModelTests: XCTestCase {
     func test_loadData_searchBar() {
         
         let search = PassthroughSubject<String, Never>()
-        let input = HomeViewModelInput.init(appear: .just(()), search: search.eraseToAnyPublisher(), loadMore: .just(""), selection: .just(0))
+        let input = HomeViewModelInput.init(appear: .just(()), search: search.eraseToAnyPublisher(), loading: .just(()), loadMore: .just(""), selection: .just(0))
         var state:HomeViewState?
         
         let expection = self.expectation(description: "movies")
@@ -64,7 +64,7 @@ class HomeViewModelTests: XCTestCase {
     func test_searchKeyword_IsFailed() {
         
         let search = PassthroughSubject<String, Never>()
-        let input = HomeViewModelInput.init(appear: .just(()), search: search.eraseToAnyPublisher(), loadMore: .just(""), selection: .just(0))
+        let input = HomeViewModelInput.init(appear: .just(()), search: search.eraseToAnyPublisher(), loading: .just(()), loadMore: .just(""), selection: .just(0))
         var state:HomeViewState?
         
         let expection = self.expectation(description: "movies")
