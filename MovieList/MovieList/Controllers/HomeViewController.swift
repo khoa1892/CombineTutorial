@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class HomeViewController: UIViewController, Routing {
+class HomeViewController: UIViewController {
     
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var searchBar: UISearchBar!
@@ -29,24 +29,12 @@ class HomeViewController: UIViewController, Routing {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         configureUI()
         configureViewModel()
         
         add(stateViewController)
         stateViewController.showStartSearch()
-    }
-    
-    public func add(_ child: UIViewController) {
-        addChild(child)
-        view.addSubview(child.view)
-        child.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            child.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            child.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            child.view.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
-            child.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-        child.didMove(toParent: self)
     }
     
     private func configureUI() {
@@ -119,18 +107,34 @@ class HomeViewController: UIViewController, Routing {
         self.present(alertController, animated: true, completion: nil)
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.searchBar.endEditing(true)
+    }
+    
+    private func add(_ child: UIViewController) {
+        addChild(child)
+        view.addSubview(child.view)
+        child.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            child.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            child.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            child.view.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            child.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        child.didMove(toParent: self)
+    }
+    
+}
+
+extension HomeViewController: Routing {
+    
     func movieDetail(_ movieId: Int) {
         
         let vc = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as! DetailViewController
         vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService<Favourite1>.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
         self.navigationController?.pushViewController(vc, animated: true)
     }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        super.touchesBegan(touches, with: event)
-        self.searchBar.endEditing(true)
-    }
-    
 }
 
 extension HomeViewController: UISearchBarDelegate {
@@ -156,7 +160,7 @@ extension HomeViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if viewModel.canLoardMore && indexPath.row >= items.count - 3 {
-            loadMore.send(searchBar.text ?? "\"\"")
+            loadMore.send(searchBar.text ?? "")
         }
     }
     
