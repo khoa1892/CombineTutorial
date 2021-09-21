@@ -41,7 +41,8 @@ class DetailViewController: UIViewController {
         
         let output = viewModel.transform(input: DetailViewModelInput.init(appear: appear.eraseToAnyPublisher(), favourite: favourite.eraseToAnyPublisher()))
         
-        output.sink { [weak self] state in
+        output.receive(on: RunLoop.main)
+            .sink { [weak self] state in
             self?.loadState(state)
         }.store(in: &cancellables)
     }
@@ -49,41 +50,31 @@ class DetailViewController: UIViewController {
     private func loadState(_ state: DetailViewState) {
         switch state {
         case .loading:
-            DispatchQueue.main.async {
-                self.loadingView.isHidden = false
-                self.loadingView.startAnimating()
-            }
+            self.loadingView.isHidden = false
+            self.loadingView.startAnimating()
             break
         case .error(let error):
-            DispatchQueue.main.async {
-                self.loadingView.isHidden = true
-                self.loadingView.stopAnimating()
-                self.showMsg(error.localizedDescription)
-            }
+            self.loadingView.isHidden = true
+            self.loadingView.stopAnimating()
+            self.showMsg(error.localizedDescription)
             break
         case .success(let movieDetail):
-            DispatchQueue.main.async {
-                self.movieDetail = movieDetail
-                
-                self.loadingView.isHidden = true
-                self.loadingView.stopAnimating()
-                self.updateView(movieDetail)
-            }
+            self.movieDetail = movieDetail
+            
+            self.loadingView.isHidden = true
+            self.loadingView.stopAnimating()
+            self.updateView(movieDetail)
             break
         case .empty:
-            DispatchQueue.main.async {
-                self.loadingView.isHidden = true
-                self.loadingView.stopAnimating()
-                self.titleLbl.text = nil
-            }
+            self.loadingView.isHidden = true
+            self.loadingView.stopAnimating()
+            self.titleLbl.text = nil
             break
         case .favourite(let isFav):
-            DispatchQueue.main.async {
-                self.addBtn.title = isFav ? "Added" : "Add"
-                self.isFav = isFav
-                self.loadingView.isHidden = true
-                self.loadingView.stopAnimating()
-            }
+            self.addBtn.title = isFav ? "Added" : "Add"
+            self.isFav = isFav
+            self.loadingView.isHidden = true
+            self.loadingView.stopAnimating()
             break
         }
     }

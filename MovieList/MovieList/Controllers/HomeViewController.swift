@@ -31,6 +31,8 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.title = "Search"
+        
         configureUI()
         configureViewModel()
         
@@ -59,7 +61,8 @@ class HomeViewController: UIViewController {
             self?.updateState(state)
         }.store(in: &cancellables)
         
-        output.sink { [weak self] state in
+        output.receive(on: RunLoop.main)
+            .sink { [weak self] state in
             
             self?.updateState(state)
         }.store(in: &cancellables)
@@ -69,40 +72,30 @@ class HomeViewController: UIViewController {
         switch state {
         case .idle:
             self.items.removeAll()
-            DispatchQueue.main.async {
-                self.stateViewController.view.isHidden = false
-                self.stateViewController.showStartSearch()
-                self.tableView.reloadData()
-            }
+            self.stateViewController.view.isHidden = false
+            self.stateViewController.showStartSearch()
+            self.tableView.reloadData()
             break
         case .empty:
             self.items.removeAll()
-            DispatchQueue.main.async {
-                self.stateViewController.view.isHidden = false
-                self.stateViewController.showNoResults()
-                self.tableView.reloadData()
-            }
+            self.stateViewController.view.isHidden = false
+            self.stateViewController.showNoResults()
+            self.tableView.reloadData()
             break
         case .loading:
-            DispatchQueue.main.async {
-                self.stateViewController.view.isHidden = false
-                self.stateViewController.startingSearch()
-            }
+            self.stateViewController.view.isHidden = false
+            self.stateViewController.startingSearch()
             break
         case .error(let error):
-            DispatchQueue.main.async {
-                self.stateViewController.view.isHidden = false
-                self.stateViewController.showNoResults()
-                self.showMsg(error.localizedDescription)
-                self.tableView.reloadData()
-            }
+            self.stateViewController.view.isHidden = false
+            self.stateViewController.showNoResults()
+            self.showMsg(error.localizedDescription)
+            self.tableView.reloadData()
             break
         case .success(let items):
-            DispatchQueue.main.async {
-                self.items = items
-                self.stateViewController.view.isHidden = true
-                self.tableView.reloadData()
-            }
+            self.items = items
+            self.stateViewController.view.isHidden = true
+            self.tableView.reloadData()
             break
         }
     }

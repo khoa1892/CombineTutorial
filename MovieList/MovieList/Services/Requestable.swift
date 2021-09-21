@@ -36,7 +36,7 @@ extension Requestable {
         let url = ApiConstant.baseUrl.appendingPathComponent("/search/movie")
         let parameters: [String: CustomStringConvertible] = [
             "api_key": ApiConstant.apiKey,
-            "query": keyword ?? "\"\"",
+            "query": keyword ?? "",
             "page": page
         ]
         return Requestable<Movies>.init(url: url, parameters: parameters)

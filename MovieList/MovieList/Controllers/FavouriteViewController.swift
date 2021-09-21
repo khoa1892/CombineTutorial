@@ -23,6 +23,9 @@ class FavouriteViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = "Favourites"
+        
         configureUI()
         configureBindings()
     }
@@ -39,7 +42,8 @@ class FavouriteViewController: UIViewController {
         let input = FavouriteViewModelInput.init(selection: selection.eraseToAnyPublisher(), appear: appear.eraseToAnyPublisher())
         let output = viewModel.transform(input: input)
         
-        output.sink { [weak self] state in
+        output.receive(on: RunLoop.main)
+            .sink { [weak self] state in
             
             self?.updateState(state)
         }.store(in: &cancellabels)
@@ -53,26 +57,20 @@ class FavouriteViewController: UIViewController {
     private func updateState(_ state: FavouriteViewState) {
         switch state {
         case .loading:
-            DispatchQueue.main.async {
-                self.loadingView.isHidden = false
-                self.loadingView.startAnimating()
-            }
+            self.loadingView.isHidden = false
+            self.loadingView.startAnimating()
             break
         case .error(let error):
-            DispatchQueue.main.async {
-                self.loadingView.stopAnimating()
-                self.loadingView.isHidden = true
-                self.showMsg(error.localizedDescription)
-                self.tableView.reloadData()
-            }
+            self.loadingView.stopAnimating()
+            self.loadingView.isHidden = true
+            self.showMsg(error.localizedDescription)
+            self.tableView.reloadData()
             break
         case .success(let items):
             self.items = items
-            DispatchQueue.main.async {
-                self.loadingView.stopAnimating()
-                self.loadingView.isHidden = true
-                self.tableView.reloadData()
-            }
+            self.loadingView.stopAnimating()
+            self.loadingView.isHidden = true
+            self.tableView.reloadData()
             break
         }
     }
