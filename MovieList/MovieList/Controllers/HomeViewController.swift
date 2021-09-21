@@ -18,6 +18,7 @@ class HomeViewController: UIViewController {
     public var viewModel:HomeViewModel!
     
     private let appear = PassthroughSubject<Void, Never>()
+    private let loading = PassthroughSubject<Void, Never>()
     private let search = PassthroughSubject<String, Never>()
     private let selection = PassthroughSubject<Int, Never>()
     private let loadMore = PassthroughSubject<String, Never>()
@@ -48,18 +49,23 @@ class HomeViewController: UIViewController {
         
         let input = HomeViewModelInput.init(appear: appear.eraseToAnyPublisher(),
                                             search: search.eraseToAnyPublisher(),
+                                            loading: loading.eraseToAnyPublisher(),
                                             loadMore: loadMore.eraseToAnyPublisher(),
                                             selection: selection.eraseToAnyPublisher())
         
         let output = viewModel.transform(input: input)
         
+        viewModel.$state.sink { [weak self] state in
+            self?.updateState(state)
+        }.store(in: &cancellables)
+        
         output.sink { [weak self] state in
             
-            self?.loadState(state)
+            self?.updateState(state)
         }.store(in: &cancellables)
     }
     
-    private func loadState(_ state: HomeViewState) {
+    private func updateState(_ state: HomeViewState) {
         switch state {
         case .idle:
             self.items.removeAll()
@@ -79,7 +85,8 @@ class HomeViewController: UIViewController {
             break
         case .loading:
             DispatchQueue.main.async {
-                self.stateViewController.view.isHidden = true
+                self.stateViewController.view.isHidden = false
+                self.stateViewController.startingSearch()
             }
             break
         case .error(let error):
@@ -140,9 +147,7 @@ extension HomeViewController: Routing {
 extension HomeViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.isEmpty {
-            searchBar.endEditing(true)
-        }
+        loading.send(())
         search.send(searchText)
     }
     

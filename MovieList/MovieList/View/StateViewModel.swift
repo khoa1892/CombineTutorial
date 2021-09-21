@@ -17,6 +17,11 @@ struct StateViewModel {
         let description = "Try searching again..."
         return StateViewModel(title: title, description: description)
     }
+    
+    static var startingSearch: StateViewModel {
+        let title = "Searching by keyword..."
+        return StateViewModel(title: title, description: nil)
+    }
 
     static var startSearch: StateViewModel {
         let title = "Search for a movie..."

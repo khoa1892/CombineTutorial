@@ -18,6 +18,7 @@ class HomeViewModel: HomeViewModelType {
     private let useCase: MoviesUseCaseType
     private var cancellabels = Set<AnyCancellable>()
     
+    @Published private(set) var state = HomeViewState.idle
     private var currentPage: Int = 1
     private var totalPage: Int = 0
     
@@ -44,6 +45,10 @@ class HomeViewModel: HomeViewModelType {
         input.selection.sink { [weak self] movieId in
             
             self?.routing?.movieDetail(movieId)
+        }.store(in: &cancellabels)
+        
+        input.loading.sink { [weak self] _ in
+            self?.state = .loading
         }.store(in: &cancellabels)
         
         let searchInput = input.search

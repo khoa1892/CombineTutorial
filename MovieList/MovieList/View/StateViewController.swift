@@ -19,6 +19,10 @@ class StateViewController: UIViewController {
     func showStartSearch() {
         updateState(viewModel: StateViewModel.startSearch)
     }
+    
+    func startingSearch() {
+        updateState(viewModel: StateViewModel.startSearch)
+    }
 
     func showNoResults() {
         updateState(viewModel: StateViewModel.noResults)

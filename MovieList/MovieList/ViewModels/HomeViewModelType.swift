@@ -12,6 +12,7 @@ struct HomeViewModelInput {
     
     let appear: AnyPublisher<Void, Never>
     let search: AnyPublisher<String, Never>
+    let loading: AnyPublisher<Void, Never>
     let loadMore: AnyPublisher<String, Never>
     let selection: AnyPublisher<Int, Never>
 }
