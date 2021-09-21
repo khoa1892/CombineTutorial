@@ -46,7 +46,7 @@ class MovieDetailUseCase: MovieDetailUseCaseType {
     var invokedCheckItemExitParametersList = [(movieId: Int, Void)]()
     var stubbedCheckItemExitResult: AnyPublisher<Result<Bool, Error>, Never>!
 
-    func checkItemExit(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never> {
+    func checkItemExist(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never> {
         invokedCheckItemExit = true
         invokedCheckItemExitCount += 1
         invokedCheckItemExitParameters = (movieId, ())

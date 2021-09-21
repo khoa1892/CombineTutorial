@@ -23,7 +23,8 @@ class DetailViewModel: DetailViewModelType {
     
     func transform(input: DetailViewModelInput) -> DetailViewModelOutput {
         
-        let favouriteClick = input.favourite.flatMap { [unowned self] result -> AnyPublisher<Result<NSManagedObject?, Error>, Never> in
+        let favouriteClick = input.favourite
+            .flatMap { [unowned self] result -> AnyPublisher<Result<NSManagedObject?, Error>, Never> in
             let (item, isFav) = result
             if isFav {
                 return self.useCase.removeFav(self.id)
@@ -49,7 +50,7 @@ class DetailViewModel: DetailViewModelType {
                 }
             }.eraseToAnyPublisher()
         
-        let favourite = self.useCase.checkItemExit(self.id)
+        let favourite = self.useCase.checkItemExist(self.id)
             .map { result -> DetailViewState in
                 switch result {
                 case .success(let isFav):

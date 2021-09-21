@@ -82,22 +82,15 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="6mG-sO-Y3a">
-                                <rect key="frame" x="0.0" y="132" width="414" height="681"/>
-                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="6mG-sO-Y3a" secondAttribute="bottom" id="4oR-SJ-axq"/>
-                            <constraint firstItem="6mG-sO-Y3a" firstAttribute="top" secondItem="0gI-47-Vhq" secondAttribute="bottom" id="Lws-AI-4iE"/>
                             <constraint firstItem="xX2-Ft-naB" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="MI0-5H-zB9"/>
                             <constraint firstItem="0gI-47-Vhq" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="MIH-7z-8t1"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="xX2-Ft-naB" secondAttribute="bottom" id="X6d-1s-IzU"/>
                             <constraint firstItem="0gI-47-Vhq" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="b0n-cz-j4D"/>
                             <constraint firstItem="0gI-47-Vhq" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="c3U-Ru-vuL"/>
-                            <constraint firstItem="6mG-sO-Y3a" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="j4b-S0-OCq"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="6mG-sO-Y3a" secondAttribute="trailing" id="l5e-2y-JOk"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="xX2-Ft-naB" secondAttribute="trailing" id="q1B-Sh-gXq"/>
                             <constraint firstItem="xX2-Ft-naB" firstAttribute="top" secondItem="0gI-47-Vhq" secondAttribute="bottom" id="qNZ-jo-7pY"/>
                         </constraints>
@@ -105,7 +98,6 @@
                     <tabBarItem key="tabBarItem" systemItem="search" id="8gp-CM-5Oy"/>
                     <navigationItem key="navigationItem" title="Movies" id="acO-Hz-lMy"/>
                     <connections>
-                        <outlet property="loadingView" destination="6mG-sO-Y3a" id="NPM-fU-t37"/>
                         <outlet property="searchBar" destination="0gI-47-Vhq" id="png-nD-DJx"/>
                         <outlet property="tableView" destination="xX2-Ft-naB" id="Ndv-nQ-CVi"/>
                         <segue destination="xvp-m4-Yno" kind="show" id="HzD-0X-NCH"/>

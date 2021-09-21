@@ -12,7 +12,8 @@ class HomeViewController: UIViewController, Routing {
     
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var searchBar: UISearchBar!
-    @IBOutlet private weak var loadingView: UIActivityIndicatorView!
+    
+    private lazy var stateViewController = StateViewController(nibName: nil, bundle: nil)
     
     public var viewModel:HomeViewModel!
     
@@ -30,8 +31,22 @@ class HomeViewController: UIViewController, Routing {
         super.viewDidLoad()
         configureUI()
         configureViewModel()
-        loadingView.startAnimating()
-        appear.send(())
+        
+        add(stateViewController)
+        stateViewController.showStartSearch()
+    }
+    
+    public func add(_ child: UIViewController) {
+        addChild(child)
+        view.addSubview(child.view)
+        child.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            child.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            child.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            child.view.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            child.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        child.didMove(toParent: self)
     }
     
     private func configureUI() {
@@ -59,33 +74,30 @@ class HomeViewController: UIViewController, Routing {
     private func loadState(_ state: HomeViewState) {
         switch state {
         case .idle:
-            print("init")
             self.items.removeAll()
             DispatchQueue.main.async {
-                self.loadingView.stopAnimating()
-                self.loadingView.isHidden = true
+                self.stateViewController.view.isHidden = false
+                self.stateViewController.showStartSearch()
                 self.tableView.reloadData()
             }
             break
         case .empty:
-            print("empty")
             self.items.removeAll()
             DispatchQueue.main.async {
-                self.loadingView.stopAnimating()
-                self.loadingView.isHidden = true
+                self.stateViewController.view.isHidden = false
+                self.stateViewController.showNoResults()
                 self.tableView.reloadData()
             }
             break
         case .loading:
             DispatchQueue.main.async {
-                self.loadingView.isHidden = false
-                self.loadingView.startAnimating()
+                self.stateViewController.view.isHidden = true
             }
             break
         case .error(let error):
             DispatchQueue.main.async {
-                self.loadingView.stopAnimating()
-                self.loadingView.isHidden = true
+                self.stateViewController.view.isHidden = false
+                self.stateViewController.showNoResults()
                 self.showMsg(error.localizedDescription)
                 self.tableView.reloadData()
             }
@@ -93,8 +105,7 @@ class HomeViewController: UIViewController, Routing {
         case .success(let items):
             DispatchQueue.main.async {
                 self.items = items
-                self.loadingView.stopAnimating()
-                self.loadingView.isHidden = true
+                self.stateViewController.view.isHidden = true
                 self.tableView.reloadData()
             }
             break
@@ -114,12 +125,25 @@ class HomeViewController: UIViewController, Routing {
         vc.viewModel = DetailViewModel.init(MovieDetailUseCase.init(networkService: ServiceProvider.defaultProvider().network, localService: LocalService<Favourite1>.init(CoreDataStack.shared.persistentContainer.viewContext)), id: movieId)
         self.navigationController?.pushViewController(vc, animated: true)
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.searchBar.endEditing(true)
+    }
+    
 }
 
 extension HomeViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            searchBar.endEditing(true)
+        }
         search.send(searchText)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.endEditing(true)
     }
 }
 

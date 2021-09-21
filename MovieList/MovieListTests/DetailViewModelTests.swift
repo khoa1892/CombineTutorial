@@ -21,7 +21,7 @@ class DetailViewModelTests: XCTestCase {
         viewModel = DetailViewModel.init(useCaseMock, id: 117404)
     }
     
-    func test_loadData_searchBar() {
+    func test_loadDetail() {
         
         var state:DetailViewState?
         

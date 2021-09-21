@@ -51,7 +51,7 @@ class HomeViewModel: HomeViewModelType {
             .removeDuplicates()
         
         let initialState: HomeViewModelOutput = .just(.idle)
-        let emptySearchString: HomeViewModelOutput = searchInput.filter({ $0.isEmpty}).map({ _ in .empty }).eraseToAnyPublisher()
+        let emptySearchString: HomeViewModelOutput = searchInput.filter({ $0.isEmpty}).map({ _ in .idle }).eraseToAnyPublisher()
         
         let searchMovies = searchInput.filter({ !$0.isEmpty })
             .flatMap { [unowned self] keyword -> AnyPublisher<Result<Movies, Error>, Never> in

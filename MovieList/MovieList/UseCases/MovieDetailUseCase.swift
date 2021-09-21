@@ -12,8 +12,7 @@ import CoreData
 protocol MovieDetailUseCaseType: AnyObject {
     
     func loadMovieDetail(_ movieId: Int) -> AnyPublisher<Result<Movie, Error>, Never>
-    func checkItemExist(_ objectID: NSManagedObjectID) -> AnyPublisher<Result<NSManagedObject, Error>, Never>
-    func checkItemExit(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never>
+    func checkItemExist(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never>
     func addFav(movieId: Int, title: String, releaseDate: String, poster: String, rating: Float) -> AnyPublisher<Result<NSManagedObject?, Error>, Never>
     func removeFav(_ movieId: Int) -> AnyPublisher<Result<NSManagedObject?, Error>, Never>
 }
@@ -36,15 +35,7 @@ class MovieDetailUseCase: MovieDetailUseCaseType {
             .eraseToAnyPublisher()
     }
     
-    func checkItemExist(_ objectID: NSManagedObjectID) -> AnyPublisher<Result<NSManagedObject, Error>, Never> {
-        return localService
-            .checkItemExist(objectID)
-            .map{ .success($0) }
-            .catch { error -> AnyPublisher<Result<NSManagedObject, Error>, Never> in .just(.failure(error)) }
-            .eraseToAnyPublisher()
-    }
-    
-    func checkItemExit(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never> {
+    func checkItemExist(_ movieId: Int) -> AnyPublisher<Result<Bool, Error>, Never> {
         return localService.checkItemExist(movieId)
             .map{ .success($0) }
             .catch { error -> AnyPublisher<Result<Bool, Error>, Never> in .just(.failure(error)) }

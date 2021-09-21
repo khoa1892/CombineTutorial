@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AlertViewController" customModule="MovieList" customModuleProvider="target">
+            <connections>
+                <outlet property="descriptionLabel" destination="hnp-qq-Oky" id="LYS-Ot-K8D"/>
+                <outlet property="titleLabel" destination="n6x-lU-mYV" id="59M-Od-X8M"/>
+                <outlet property="view" destination="BDS-vt-aBS" id="8qx-BW-Vai"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="BDS-vt-aBS">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="wx3-Im-10r">
+                    <rect key="frame" x="122" y="424" width="170" height="58.5"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Movies" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n6x-lU-mYV">
+                            <rect key="frame" x="42.5" y="0.0" width="85" height="21.5"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Start searching for movies" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hnp-qq-Oky">
+                            <rect key="frame" x="0.0" y="41.5" width="170" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="ZLf-cA-8vO"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="wx3-Im-10r" firstAttribute="centerX" secondItem="ZLf-cA-8vO" secondAttribute="centerX" id="6rO-dR-dc8"/>
+                <constraint firstItem="wx3-Im-10r" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ZLf-cA-8vO" secondAttribute="leading" constant="8" id="VzF-HQ-vjA"/>
+                <constraint firstItem="ZLf-cA-8vO" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="wx3-Im-10r" secondAttribute="trailing" constant="8" id="rCX-yI-3JK"/>
+                <constraint firstItem="wx3-Im-10r" firstAttribute="centerY" secondItem="ZLf-cA-8vO" secondAttribute="centerY" id="uRO-cW-J9B"/>
+            </constraints>
+            <point key="canvasLocation" x="34.5" y="111.5"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
